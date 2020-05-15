@@ -1,13 +1,15 @@
 package com.cutout.display
 
+import android.app.Activity
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import androidx.constraintlayout.widget.ConstraintLayout
+import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,14 +23,36 @@ class MainActivity : AppCompatActivity() {
         var decorView = window.decorView
         var option = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
         decorView.systemUiVisibility = option
+
         actionBar?.hide()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val param = window.attributes
-            param.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            window.attributes = param
+            //设刘海屏样式
+//            val param = window.attributes
+//            param.layoutInDisplayCutoutMode =
+//                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+//            window.attributes = param
+
+            //获取安全显示区域，交互控件进行相应的位置偏移
+            root_layout.setOnApplyWindowInsetsListener(View.OnApplyWindowInsetsListener { view, windowInsets ->
+                val displayCutout = windowInsets.displayCutout
+                if (displayCutout != null) {
+                    val left = displayCutout.safeInsetLeft
+                    val top = displayCutout.safeInsetTop
+                    val right = displayCutout.safeInsetRight
+                    val bottom = displayCutout.safeInsetBottom
+
+                    val paramsTop = top_btn.layoutParams as ConstraintLayout.LayoutParams
+                    paramsTop.setMargins(0, top, 0, 0)
+
+                    val paramsLeft = left_btn.layoutParams as ConstraintLayout.LayoutParams
+                    paramsLeft.setMargins(left, 0, 0, 0)
+
+                }
+                return@OnApplyWindowInsetsListener windowInsets.consumeStableInsets()
+            })
         }
+
     }
 
 
